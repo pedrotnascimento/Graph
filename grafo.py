@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
-
 data =[
     {
         "name":"ALPHA",
@@ -44,13 +43,121 @@ class Node:
 
         for key, values in kwargs.items():
             self[key] = kwargs[values]
-node_list = [Node(i, i.code) for i in otan_list]
+node_list = [Node(i, "code") for i in otan_list]
+
+case1 = otan_list[0]
+case1.id = "xyz"
+test1 = Node(case1)
+print "teste node com entrada que tem atributo id", test1.__dict__
 
 
-class Vertex:
-    def __init__(self):
-        pass
+class Vertex(Node):
+    """
+    func: function: funcao que o vertex pode aplicar
+    """
+    def __init__(self, struct, weight=1, id_param=None, func=None):
+        Node.__init__(self, struct, id_param)
+        """
+        WIKI:
+        Fiz esse erro e nao sei o por que dele:
+        super(Node, self).__init__(struct, id_param)
+        TypeError: must be type, not classobj
+        """
+        self.weight = weight
+        self.apply = func
+        self.outdeg = 0
+        self.indeg = 0
+        self.edges = []
 
+    def degrees(self):
+        return self.outdeg + self.indeg
+
+    @staticmethod
+    def is_vertex(v):
+        return isinstance(v, Vertex)
+
+    @staticmethod
+    def all_vertex(vertexes):
+        # any(map(Vertex.is_vertex, vertex))
+        if type(vertexes) is not list:
+            print "Expected a Vertex or list of Vertex\n" \
+                "received ", type(vertexes)
+            return None
+        n = len(vertexes)
+        for v, i in zip(vertexes, range(n)):
+            if not Vertex.is_vertex(v):
+                print "Expected only Vertex in the list\n", \
+                    "pos: ", i, "is ", type(v)
+                return False
+        return True
+
+    def add_edges(self, vertexes):
+        if Vertex.is_vertex(vertexes):
+            self.edges.append(vertexes)
+            self.outdeg += 1
+            vertexes.indeg += 1
+            return True
+        elif Vertex.all_vertex(vertexes):
+            self.edges += vertexes
+            self.outdeg += len(vertexes)
+            for v in vertexes:
+                v.indeg += 1
+            return True
+        return False
+
+    def remove_edges(self, vertexes, id_param=None):
+        if Vertex.is_vertex(vertexes) and vertexes in self.edges:
+            self.edges.remove(vertexes)
+            self.outdeg -= 1
+            vertexes.indeg -= 1
+            return True
+        elif Vertex.all_vertex(vertexes):
+            n = len(vertexes)
+            for v, i in zip(vertexes, range(n)):
+                if v in self.edges:
+                    self.edges.remove(v)
+                    self.outdeg -= 1
+                    v.indeg -= 1
+                else:
+                    print "Vertex ", v, "is not a neighbour", "pos: ", i
+            print "all CONTAINED vertex removed"
+            return True
+        return False
+
+V = [Vertex(i) for i in otan_list]
+# TESTES
+# Vertex.is_vertex(V[0]) == True
+# Vertex.is_vertex(otan_list) == False
+# Vertex.all_vertex(V) == True
+# Vertex.all_vertex(otan_list) == False
+# Vertex.all_vertex(V + otan_list) == False
+# v = V[0]
+# v1 = Vertex(1)
+# v2 = Vertex(2)
+# v.add_edges(v1) == True
+# v.outdeg == 1
+# v1.indeg == 1
+# v.add_edges(v2) == True
+# v.outdeg == 2
+# v2.indeg == 1
+# v.indeg == 0
+# v1.outdeg == 0
+# v2.outdeg == 0
+# v.remove_edges(v1) == True
+# v.outdeg == 1
+# v1.indeg== 0
+# v.indeg == 0
+# v1.outdeg == 0
+# v2.outdeg == 0
+# v2.indeg == 1
+# v.add_edges(V) == True
+# [i.indeg for i in V] == [1, 1, 1]
+# v.add_edges(V[1:]) == True
+# [i.indeg for i in V] == [1, 2, 2]
+# v.remove_edges(V)
+# [i.indeg for i in V] ==> [0, 1, 1]
+# v.remove_edges(V) == True
+# [i.indeg for i in V] ==> [0, 0, 0]
 
 class Graph():
     def __init__(self, struct, *args, **kwargs):
