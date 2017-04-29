@@ -54,7 +54,7 @@ node_list = [Node(i, "code") for i in otan_list]
 case1 = otan_list[0]
 case1.id = "xyz"
 test1 = Node(case1)
-print "teste node com entrada que tem atributo id", test1.__dict__
+# print "teste node com entrada que tem atributo id", test1.__dict__
 
 
 class Vertex(Node):
@@ -227,7 +227,7 @@ class Graph():
             print v.id, "->",
             for u, i in zip(v.v_adj(), range(len(v.adj))):
                 print u.id,
-                if len(u.adj)-1 > i:
+                if len(v.adj)-1 > i:
                     print ",",
             print "\n" #parece que esse código faz flush, não é isso?
         return True
@@ -309,15 +309,15 @@ class Graph():
         pass
 
 
-V = [Vertex(i) for i in otan_list]
+V1= [Vertex(i) for i in otan_list]
 V2 = [Vertex(i) for i in otan_list]
 V3 = [Vertex(i) for i in otan_list]
 a = Vertex(1)
 # a.add(V[0])
 # a.add(V[1])
 # a.add(V[2])
-V[0].add(V[1])
-V[1].add(V[0])
+V1[0].add(V1[1])
+V1[1].add(V1[0])
 
 # nao funciona se 'a'for orientado
 # g1= Graph(edges=[[V[2],V[1]]],vertexes=[a,V[0]])
@@ -326,4 +326,12 @@ V[1].add(V[0])
 # g2 = Graph(vertexes=[V[0],V[1]], oriented=False)
 
 # TODO: não funciona para vertexes já inicializados direcionados
-g2 = Graph(edges=[[V[2],V[1]]],vertexes=[V[1],V[2]], oriented=False)
+# g2 = Graph(edges=[[V[2],V[1]]],vertexes=[V[1],V[2]], oriented=False)
+
+#Wikipedia exemplo
+V = [Vertex(i+1) for i in range(6)]
+edges = [[V[0],V[4]],[V[0],V[1]],
+         [V[1],V[4]],[V[1],V[2]],
+         [V[2],V[3]],
+         [V[3],V[5]],[V[3],V[4]]]
+g2 = Graph(edges=edges, oriented=False)
