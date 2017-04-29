@@ -76,7 +76,6 @@ class Vertex(Node):
             # TODO exception, cancelar criacao da classe
             print "classe precisa ter identificação"
 
-
         self.weight = weight
         self.apply = func
         self.outdeg = 0
@@ -107,8 +106,8 @@ class Vertex(Node):
 
     def has_adjacent(self, vertex):
         n = len(self.adj)
-        for e, i in zip(self.adj, range(n)):
-            if e.v is vertex:
+        for v, i in zip(self.v_adj(), range(n)):
+            if v is vertex:
                 return i
         return -1
 
@@ -129,6 +128,9 @@ class Vertex(Node):
         print "vertice", v, "nao eh adjcente a", self
         return False
 
+    def v_adj(self):
+        return map(lambda x: x.v, self.adj)
+
 V = [Vertex(i) for i in otan_list]
 V2 = [Vertex(i) for i in otan_list]
 V3 = [Vertex(i) for i in otan_list]
@@ -142,11 +144,8 @@ class Edge:
 
     @staticmethod
     def get_weight(v1, v2):
-        print v1.adj
         for e in v1.adj:
-            print e.v, v2
             if e.v is v2:
-                print e.weight
                 return e.weight if e.weight!=0 else "0"
         return False
 
@@ -159,13 +158,14 @@ class Edge:
                 return True
         return False
 
+
 class Graph():
     def __init__(self, edges=[], vertexes=[], oriented=True, matrix=False, matrix_tam=None):
         # TODO: check if they all exists first
         self.oriented = oriented
         self.vertexes = set(vertexes)
         for v in vertexes:
-            self.vertexes |= set(map(lambda x: x.v, v.adj))
+            self.vertexes |= set(v.v_adj())
         for e in edges:
             self.conn(e[0], e[1])
             if not self.oriented:
@@ -174,7 +174,6 @@ class Graph():
         if matrix:
             print "create matrix TAM", matrix_tam
             pass
-
 
     def conn(self, vertex, vertexes, weights=None):
         # TODO: minimizar código em relação a #pesos e #vertice
@@ -228,9 +227,9 @@ class Graph():
     def print_adj(self):
         for v in self.vertexes:
             print v.id, "->",
-            for e,i in zip(v.adj, range(len(v.adj))):
-                print e.v.id,
-                if len(v.adj)-1 > i:
+            for u, i in zip(v.v_adj(), range(len(v.adj))):
+                print u.id,
+                if len(u.adj)-1 > i:
                     print ",",
             print "\n" #parece que esse código faz flush, não é isso?
         return True
@@ -239,12 +238,12 @@ class Graph():
     def inverse_edges(self, v1, v2):
         w1 = w2 = False
         if v1.has_adjacent(v2) !=-1:
-            print "hey", v1.adj
-            w1 = Edge.get_weight(v1,v2)
-            self.disconn(v1,v2)
+            w1 = Edge.get_weight(v1, v2)
+            self.disconn(v1, v2)
         if v2.has_adjacent(v1) != -1:
-            w2 = Edge.get_weight(v2,v1)
-            self.disconn(v2,v1)
+            w2 = Edge.get_weight(v2, v1)
+            self.disconn(v2, v1)
+
         if w1:
             w1 = 0 if w1 == "0" else w1
             self.conn(v2, v1, w1)
@@ -255,13 +254,19 @@ class Graph():
 
     # inverse the in/out edges of an vertex
     def inverse_degree(self, vertex):
-        temp = list(vertex.adj)
-        for e in temp:
-            self.inverse_edges(vertex, e.v)
+        temp = list(vertex.v_adj())
+        for v in self.vertexes:
+            if v is not vertex:
+                for u in v.v_adj():
+                    if u is vertex:
+                        self.inverse_edges(v, u)
+        for v in temp:
+            self.inverse_edges(vertex, v)
         return True
 
     # map apply the function to the dfs, still not clear how it will do that
     def deep_first_search(self, vertex, map=None):
+
         pass
     dfs = deep_first_search
 
