@@ -104,12 +104,12 @@ class Vertex(Node):
                 return False
         return True
 
-    def has_adjacent(self, vertex):
+    def has_adj(self, vertex):
         n = len(self.adj)
         for v, i in zip(self.v_adj(), range(n)):
             if v is vertex:
-                return i
-        return -1
+                return True
+        return False
 
     def add(self, v, weight=1):
         e = Edge(v, weight=weight)
@@ -131,10 +131,6 @@ class Vertex(Node):
     def v_adj(self):
         return map(lambda x: x.v, self.adj)
 
-V = [Vertex(i) for i in otan_list]
-V2 = [Vertex(i) for i in otan_list]
-V3 = [Vertex(i) for i in otan_list]
-a = Vertex(1)
 
 class Edge:
     def __init__(self, adj_v, struct=None, weight=1):
@@ -168,8 +164,6 @@ class Graph():
             self.vertexes |= set(v.v_adj())
         for e in edges:
             self.conn(e[0], e[1])
-            if not self.oriented:
-                self.conn(e[1], e[0])
 
         if matrix:
             print "create matrix TAM", matrix_tam
@@ -189,6 +183,10 @@ class Graph():
 
         if Vertex.all(vertexes):
             for v, w in zip(vertexes, weights):
+                if vertex.has_adj(v):
+                    vertex.outdeg += 1
+                    v.indeg += 1
+                    continue
                 vertex.add(v,w)
                 self.vertexes |= {vertex, v}
                 if not self.oriented:
@@ -202,7 +200,7 @@ class Graph():
         if Vertex.all(vertexes):
             n = len(vertexes)
             for v, i in zip(vertexes, range(n)):
-                if vertex.has_adjacent(v) != -1 and \
+                if vertex.has_adj(v) and \
                         filter(args):
                     removed = vertex.remove(v)
                     if not self.oriented:
@@ -237,10 +235,10 @@ class Graph():
     # inverse the edges between two vertices
     def inverse_edges(self, v1, v2):
         w1 = w2 = False
-        if v1.has_adjacent(v2) !=-1:
+        if v1.has_adj(v2):
             w1 = Edge.get_weight(v1, v2)
             self.disconn(v1, v2)
-        if v2.has_adjacent(v1) != -1:
+        if v2.has_adj(v1):
             w2 = Edge.get_weight(v2, v1)
             self.disconn(v2, v1)
 
@@ -309,3 +307,23 @@ class Graph():
     def update_weights(self, map):
         # print atualiza todos os pesos de acordo com a função map
         pass
+
+
+V = [Vertex(i) for i in otan_list]
+V2 = [Vertex(i) for i in otan_list]
+V3 = [Vertex(i) for i in otan_list]
+a = Vertex(1)
+# a.add(V[0])
+# a.add(V[1])
+# a.add(V[2])
+V[0].add(V[1])
+V[1].add(V[0])
+
+# nao funciona se 'a'for orientado
+# g1= Graph(edges=[[V[2],V[1]]],vertexes=[a,V[0]])
+
+# funciona para vertices inicializados como nao direcionados e como edges que nao tem adjencia
+# g2 = Graph(vertexes=[V[0],V[1]], oriented=False)
+
+# TODO: não funciona para vertexes já inicializados direcionados
+g2 = Graph(edges=[[V[2],V[1]]],vertexes=[V[1],V[2]], oriented=False)

@@ -77,3 +77,4 @@ a.add(V[2])
 V[0].add(V[1])
 g1= Graph(edges=[[V[2],V[1]]],vertexes=[a,V[0]])
 g1.print_adj()
+
