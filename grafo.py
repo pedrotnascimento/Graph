@@ -61,6 +61,7 @@ class Vertex(Node):
     """
     func: function: funcao que o vertex pode aplicar
     """
+    # TODO implementar get_neighbors, para nao ficar pegando da adj
     def __init__(self, struct, weight=1, id_param=None, func=None):
         Node.__init__(self, struct, id_param)
         """
@@ -106,12 +107,9 @@ class Vertex(Node):
 
     def has_adjacent(self, vertex):
         n = len(self.adj)
-        # print "v", vertex
         for e, i in zip(self.adj, range(n)):
-            # print e.v is vertex, "e.v", e.v
             if e.v is vertex:
                 return i
-
         return -1
 
     def add(self, v, weight=1):
@@ -142,6 +140,24 @@ class Edge:
         self.v = adj_v
         self.weight = weight if weight is not None else 1
 
+    @staticmethod
+    def get_weight(v1, v2):
+        print v1.adj
+        for e in v1.adj:
+            print e.v, v2
+            if e.v is v2:
+                print e.weight
+                return e.weight if e.weight!=0 else "0"
+        return False
+
+    @staticmethod
+    # map is function which will set the weight according to the function
+    def setWeigth(v1, v2, weight, map=None):
+        for e in v1.adj:
+            if e.v is v2:
+                e.weight = weight
+                return True
+        return False
 
 class Graph():
     def __init__(self, edges=[], vertexes=[], oriented=True, matrix=False, matrix_tam=None):
@@ -220,20 +236,29 @@ class Graph():
         return True
 
     # inverse the edges between two vertices
-    def inverseVertices(self, v1, v2):
-        pass
+    def inverse_edges(self, v1, v2):
+        w1 = w2 = False
+        if v1.has_adjacent(v2) !=-1:
+            print "hey", v1.adj
+            w1 = Edge.get_weight(v1,v2)
+            self.disconn(v1,v2)
+        if v2.has_adjacent(v1) != -1:
+            w2 = Edge.get_weight(v2,v1)
+            self.disconn(v2,v1)
+        if w1:
+            w1 = 0 if w1 == "0" else w1
+            self.conn(v2, v1, w1)
+        if w2:
+            w2 = 0 if w2 == "0" else w2
+            self.conn(v1, v2, w2)
+        return True
 
-    # inverse the in/out edges
-    def inverseDegree(self, vertex):
-        pass
-
-    # invertice all edges for all vertices
-    def inverseAll(self):
-        pass
-
-    # map is function which will set the weight according to the function
-    def setWeigth(self, vertex1, vertex2, weigth, map=None):
-        pass
+    # inverse the in/out edges of an vertex
+    def inverse_degree(self, vertex):
+        temp = list(vertex.adj)
+        for e in temp:
+            self.inverse_edges(vertex, e.v)
+        return True
 
     # map apply the function to the dfs, still not clear how it will do that
     def deep_first_search(self, vertex, map=None):
@@ -261,8 +286,21 @@ class Graph():
     def Dkistra(self):
         pass
 
+    # invertice all edges for all vertices NÃO
+    def inverseAll(self):
+        # implementar dfs primeiro
+        pass
+
+    # gera grafo onde todas os sentidos tendem a um vertice
+    # árvore com o sentido apontado sempre pro pai
+    def concentrate(self):
+        pass
+
+    # gera grafo onde todos os sentidos sao repelidos do vertice
+    # árvore com o sentido apontado para o filho
+    def dispersate(self):
+        pass
+
     def update_weights(self, map):
         # print atualiza todos os pesos de acordo com a função map
         pass
-
-
