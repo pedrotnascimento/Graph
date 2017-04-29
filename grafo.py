@@ -262,6 +262,14 @@ class Graph():
             self.inverse_edges(vertex, v)
         return True
 
+    def dfs(self, first_v=None):
+        self.clear_visited()
+        if first_v is not None:
+            self.deep_first_search(first_v)
+        else:
+            for v in self.vertexes:
+                self.deep_first_search(v)
+
     # map apply the function to the dfs, still not clear how it will do that
     def deep_first_search(self, vertex):
         vertex.visited = True
@@ -269,16 +277,38 @@ class Graph():
         for v in vertex.v_adj():
             if v.visited is False:
                 self.deep_first_search(v)
+        return True
 
-    def dfs(self, vertex):
-        for v in self.vertexes:
-            v.visited = False
-        self.deep_first_search(vertex)
+    def bfs(self, first_v=None):
+        self.clear_visited()
+        if first_v is not None:
+            self.breadth_first_search(first_v)
+        else:
+            for v in self.vertexes:
+                self.breadth_first_search(v)
 
     # map apply the function to the dfs, still not clear how it will do that
-    def breadth_first_search(self, vertex, map=None):
-        pass
-    bfs = breadth_first_search
+    def breadth_first_search(self, vertex, queue=None, func=None):
+        if queue is None:
+            queue = []
+
+        vertex.visited = True
+        print vertex.id
+        for q in vertex.v_adj():
+            # usar flag em outras linguagens
+            if q not in queue and not q.visited:
+                queue.append(q)
+
+        # print "fila", map(lambda x: x.id, queue)
+        while(queue):
+            v = queue[0]
+            queue = queue[1:]
+            queue = self.breadth_first_search(v, queue)
+        return queue
+
+    def clear_visited(self):
+        for v in self.vertexes:
+            v.visited = False
 
     def hasCycle(self):
         print "checa o próprio grafo em busca de ciclo"
