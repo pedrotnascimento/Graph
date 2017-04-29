@@ -263,10 +263,17 @@ class Graph():
         return True
 
     # map apply the function to the dfs, still not clear how it will do that
-    def deep_first_search(self, vertex, map=None):
+    def deep_first_search(self, vertex):
+        vertex.visited = True
+        print vertex.id
+        for v in vertex.v_adj():
+            if v.visited is False:
+                self.deep_first_search(v)
 
-        pass
-    dfs = deep_first_search
+    def dfs(self, vertex):
+        for v in self.vertexes:
+            v.visited = False
+        self.deep_first_search(vertex)
 
     # map apply the function to the dfs, still not clear how it will do that
     def breadth_first_search(self, vertex, map=None):
